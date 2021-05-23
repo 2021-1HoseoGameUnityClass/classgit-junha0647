@@ -47,7 +47,6 @@ public class Player : MonoBehaviour
     // 플레이어 움직임
     private void PlayerMove()
     {
-
         // 쌍따옴표 사용 시 string 문자열값 받아온다.
         float h = Input.GetAxis("Horizontal");
         float playerSpeed = h * moveSpeed * Time.deltaTime;
