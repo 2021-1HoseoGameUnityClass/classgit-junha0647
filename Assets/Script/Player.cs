@@ -20,13 +20,6 @@ public class Player : MonoBehaviour
     [SerializeField] private GameObject bulletPos = null;
     [SerializeField] private GameObject bulletObj = null;
 
-    // Start is called before the first frame update
-    // 스크립트가 시작될 때 함수가 실행됨
-    void Start()
-    {
-        
-    }
-
     // Update is called once per frame
     // 프레임마다 함수가 실행됨
     void Update() // == private void Update()
@@ -105,6 +98,7 @@ public class Player : MonoBehaviour
     // 플레이어 총알 발사
     private void Fire()
     {
+        GetComponent<AudioSource>().Play();
         float direction = transform.localScale.x;
         Quaternion quaternion = new Quaternion(0, 0, 0, 0);
         Instantiate(bulletObj, bulletPos.transform.position, quaternion).GetComponent<Bullet>().InstantiateBullet(direction);
