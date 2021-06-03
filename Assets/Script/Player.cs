@@ -20,17 +20,21 @@ public class Player : MonoBehaviour
     [SerializeField] private GameObject bulletPos = null;
     [SerializeField] private GameObject bulletObj = null;
 
+    private bool move = false;
+    private float moveHorizontal = 0;
+
     // Update is called once per frame
     // 프레임마다 함수가 실행됨
     void Update() // == private void Update()
     {
-        PlayerMove();
-
+        if(move == true)
+        {
+            PlayerMove();
+        }
         if(Input.GetButtonDown("Jump"))
         {
             PlayerJump();
         }
-
         if(Input.GetButtonDown("Fire1"))
         {
             Fire();
@@ -41,7 +45,8 @@ public class Player : MonoBehaviour
     private void PlayerMove()
     {
         // 쌍따옴표 사용 시 string 문자열값 받아온다.
-        float h = Input.GetAxis("Horizontal");
+        //float h = Input.GetAxis("Horizontal");
+        float h = moveHorizontal;
         float playerSpeed = h * moveSpeed * Time.deltaTime;
         Vector3 vector3 = new Vector3();
         vector3.x = playerSpeed;
@@ -67,7 +72,6 @@ public class Player : MonoBehaviour
             transform.localScale = new Vector3(1, 1, 1);
         }
     }
-
     // 플레이어 점프
     private void PlayerJump()
     {
@@ -84,6 +88,19 @@ public class Player : MonoBehaviour
             isJump = true;
         }
     }
+    // 플레이어 총알 발사
+    private void Fire()
+    {
+        AudioClip audioClip = Resources.Load<AudioClip>("RangedAttack") as AudioClip;
+        GetComponent<AudioSource>().clip = audioClip;
+        GetComponent<AudioSource>().Play();
+
+        float direction = transform.localScale.x;
+        Quaternion quaternion = new Quaternion(0, 0, 0, 0);
+        Instantiate(bulletObj, bulletPos.transform.position, quaternion).GetComponent<Bullet>().InstantiateBullet(direction);
+    }
+
+
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -94,13 +111,37 @@ public class Player : MonoBehaviour
             isJump = false;
         }
     }
-
-    // 플레이어 총알 발사
-    private void Fire()
+    private void OnCollisionExit2D(Collision2D collision)
     {
-        GetComponent<AudioSource>().Play();
-        float direction = transform.localScale.x;
-        Quaternion quaternion = new Quaternion(0, 0, 0, 0);
-        Instantiate(bulletObj, bulletPos.transform.position, quaternion).GetComponent<Bullet>().InstantiateBullet(direction);
+        // 충돌체의 콜라이더가 플랫폼 태그라면
+        if (collision.collider.tag == "Enemy")
+        {
+            DataManager.instance.playerHP -= 1;
+            if (DataManager.instance.playerHP < 0)
+            {
+                DataManager.instance.playerHP = 0;
+            }
+            UIManager.instance.PlayerHP();
+        }
+    }
+
+
+
+    public void OnMove(bool _right)
+    {
+        if(_right)
+        {
+            moveHorizontal = 1;
+        }
+        else
+        {
+            moveHorizontal = -1;
+        }
+        move = true;
+    }
+    public void OffMove()
+    {
+        moveHorizontal = 0;
+        move = false;
     }
 }
